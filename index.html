@@ -21,8 +21,8 @@
     #app {
       width: 100%;
       max-width: 420px;
-      background: rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(16px);
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(6px);
       border-radius: 28px;
       padding: 64px 24px 48px;
       text-align: center;
@@ -165,6 +165,13 @@
         trumpet.currentTime = 0;
         trumpet.play();
       } catch (e) {}
+
+      document.body.style.backgroundImage = "url('happy.jpg')";
+
+      app.innerHTML =
+        '<h1>hell yeah im a baller.</h1>' +
+        '<img class="capy" src="capybara.jpg" alt="capybara" />';
+    } catch (e) {}
 
       app.innerHTML =
         '<h1>hell yeah im a baller.</h1>' +
