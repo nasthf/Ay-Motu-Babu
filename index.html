@@ -16,41 +16,32 @@
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      /* no transition for background image */
     }
 
     #app {
       width: 100%;
       max-width: 420px;
-      background: rgba(255, 255, 255, 0.32);
-      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(16px);
       border-radius: 28px;
-      padding: 72px 24px 48px;
+      padding: 64px 24px 48px;
       text-align: center;
       box-shadow: 0 25px 50px rgba(0,0,0,0.35);
-      animation: floatIn 0.8s ease;
       position: relative;
-      overflow: hidden;
-    }
-
-    @keyframes floatIn {
-      from { opacity: 0; transform: translateY(30px) scale(0.95); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     h1 {
-      color: #1e3a8a;
+      color: #1e40af;
       font-size: 26px;
-      margin-bottom: 64px;
-      margin-top: 0;
+      margin: 0 0 64px 0;
     }
 
     .buttons {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 16px;
-      min-height: 140px;
+      gap: 80px;
+      min-height: 160px;
       position: relative;
     }
 
@@ -58,12 +49,10 @@
       font-family: 'Playfair Display', serif;
       border: none;
       border-radius: 999px;
-      padding: 14px 30px;
+      padding: 14px 36px;
       font-size: 18px;
       cursor: pointer;
-      transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
       box-shadow: 0 10px 25px rgba(0,0,0,0.35);
-      position: relative;
     }
 
     button.yes {
@@ -76,32 +65,20 @@
       background: #bfdbfe;
       color: #1e3a8a;
       z-index: 3;
-      position: absolute;
     }
 
-    button:hover { transform: translateY(-3px) scale(1.05); }
-    button:active { transform: scale(0.92); }
-
-    .fade-out {
-      opacity: 0;
-      pointer-events: none;
+    @keyframes pulse {
+      0% { transform: scale(var(--base-scale)); }
+      50% { transform: scale(calc(var(--base-scale) * 1.08)); }
+      100% { transform: scale(var(--base-scale)); }
     }
 
-    .confetti {
-      position: fixed;
-      font-size: 24px;
-      pointer-events: none;
-      animation: confettiFall 2.2s linear forwards;
-      z-index: 9999;
-    }
-
-    @keyframes confettiFall {
-      from { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
-      to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    .pulse {
+      animation: pulse 2.2s ease-in-out infinite;
     }
 
     img.capy {
-      max-width: 70%;
+      max-width: 75%;
       border-radius: 22px;
       margin-top: 24px;
       box-shadow: 0 12px 30px rgba(0,0,0,0.35);
@@ -116,7 +93,6 @@
   <script>
     const app = document.getElementById('app');
     const trumpet = document.getElementById('trumpet');
-    trumpet.volume = 1.0;
 
     const backgrounds = [
       'intro.jpg',
@@ -132,14 +108,14 @@
     let yesScale = 1;
     let noScale = 1;
 
-    document.body.style.backgroundImage = `url('${backgrounds[0]}')`;
+    document.body.style.backgroundImage = "url('" + backgrounds[0] + "')";
 
     function questionText() {
       const questions = [
         'Will you go out with me?',
         'WTF?? Are you SURE?',
-        "BRUH, if you click no you're gae",
-        'Wow, last chance, i cant believe this, smh.',
+        "BRUH, if you click no you are gae",
+        'Wow, last chance, I cannot believe this.',
         'OH MY GOD JUST SAY YES',
         '..........',
         'oops, you have no choice'
@@ -148,62 +124,51 @@
     }
 
     function renderQuestion() {
-      const hideNo = noCount >= 6;
-
-      app.innerHTML = `
-        <h1>${questionText()}</h1>
-        <div class="buttons">
-          <button class="yes" id="yesBtn">Yes</button>
-          <button class="no ${hideNo ? 'fade-out' : ''}" id="noBtn">No</button>
-        </div>
-      `;
+      app.innerHTML =
+        '<h1>' + questionText() + '</h1>' +
+        '<div class="buttons">' +
+          '<button class="yes" id="yesBtn">Yes</button>' +
+          '<button class="no" id="noBtn">No</button>' +
+        '</div>';
 
       const yesBtn = document.getElementById('yesBtn');
       const noBtn = document.getElementById('noBtn');
 
-      yesBtn.style.transform = `scale(${yesScale})`;
+      yesBtn.style.setProperty('--base-scale', yesScale);
+      yesBtn.style.transform = 'scale(' + yesScale + ')';
+      noBtn.style.transform = 'scale(' + noScale + ')';
 
-      if (noBtn) {
-        noBtn.style.transform = `scale(${noScale})`;
-        noBtn.style.left = `${50 + Math.sin(noCount) * 40}%`;
-        noBtn.style.top = `${50 + Math.cos(noCount) * 30}%`;
+      if (noCount >= 6) {
+        yesBtn.style.setProperty('--base-scale', yesScale);
+        yesBtn.style.transform = 'scale(' + yesScale + ')';
+        yesBtn.classList.add('pulse');
+        noBtn.style.display = 'none';
       }
 
       yesBtn.onclick = celebrate;
 
-      if (noBtn) {
-        noBtn.onclick = () => {
-          noCount++;
-          yesScale += 0.3;
-          noScale = Math.max(0.15, noScale - 0.18);
+      noBtn.onclick = function () {
+        noCount++;
+        yesScale += 0.3;
+        noScale = Math.max(0.25, noScale - 0.18);
 
-          if (backgrounds[noCount]) {
-            document.body.style.backgroundImage = `url('${backgrounds[noCount]}')`;
-          }
+        if (backgrounds[noCount]) {
+          document.body.style.backgroundImage = "url('" + backgrounds[noCount] + "')";
+        }
 
-          renderQuestion();
-        };
-      }
+        renderQuestion();
+      };
     }
 
     function celebrate() {
-      trumpet.currentTime = 0;
-      trumpet.play().catch(() => {});
+      try {
+        trumpet.currentTime = 0;
+        trumpet.play();
+      } catch (e) {}
 
-      app.innerHTML = `
-        <h1>hell yeah im a baller.</h1>
-        <img class="capy" src="capybara.jpg" alt="capybara">
-      `;
-
-      for (let i = 0; i < 220; i++) {
-        const conf = document.createElement('div');
-        conf.className = 'confetti';
-        conf.textContent = ['🎉','✨','💙','🎺'][Math.floor(Math.random() * 4)];
-        conf.style.left = Math.random() * 100 + 'vw';
-        conf.style.animationDelay = Math.random() * 0.5 + 's';
-        document.body.appendChild(conf);
-        setTimeout(() => conf.remove(), 1600);
-      }
+      app.innerHTML =
+        '<h1>hell yeah im a baller.</h1>' +
+        '<img class="capy" src="capybara.jpg" alt="capybara" />';
     }
 
     renderQuestion();
